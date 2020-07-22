@@ -1,9 +1,12 @@
 import csv
 
-def parse_csv(filename, select=None, types=None, has_headers = True, delimiter=','):
+def parse_csv(filename, select=None, types=None, has_headers = True, delimiter=',', silence_errors = False):
     '''
     Parse a CSV file into a list of records
     '''
+    if select and not has_headers:
+        raise RuntimeError ("select requires column headers")
+
     with open(filename) as f:
         rows = csv.reader(f, delimiter=delimiter)
 
@@ -11,6 +14,9 @@ def parse_csv(filename, select=None, types=None, has_headers = True, delimiter='
         # Read the file headers
         if has_headers:
             headers = next(rows)
+        else:
+            []
+        
         if select:
             indices = [headers.index(colname) for colname in select]
             headers = select
@@ -43,7 +49,8 @@ records= parse_csv('Data/portfolio.csv', types= [str, int, float])
 print(records)
 records= parse_csv('Data/portfolio.csv', types= [str, int], select = ['name', 'shares'])
 print(records)
-records= parse_csv('Data/prices.csv',types = [str, float], has_headers=False)
+#records= parse_csv('Data/prices.csv',types = [str, float], has_headers=False)
+parse_csv('Data/prices.csv', select=['name','price'], has_headers=False)
 print(records)
 
 records= parse_csv('Data/portfolio.dat',types = [str,int, float], delimiter= ' ')
